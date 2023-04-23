@@ -1,0 +1,193 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">折线图</div>
+            <div class="panel-body">
+                <div id="m2" style="width: 100%;height: 400px;"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">散点图</div>
+                    <div class="panel-body">
+                        <div id="m3" style="width: 100%;height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">饼图</div>
+                    <div class="panel-body">
+                        <div id="m4" style="width: 100%;height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div id="m5" style="width: 100%;height: 400px;">
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block js %}
+
+    <script src="{% static 'js/echarts.js' %}"></script>
+    <script type="text/javascript">
+
+        $(function () {
+            initBar();
+            initPie();
+            initPoint();
+        })
+
+        function initBar() {
+            var chartDom = document.getElementById('m2');
+            var myChart = echarts.init(chartDom);
+            var option;
+
+            option = {
+                title: {text: "温度折线图"},
+                xAxis: {
+                    type: 'category',
+                    data: []
+                },
+                yAxis: {
+                    type: 'value',
+                    data: []
+                },
+                series: [
+                    {
+                        data: [],
+                        type: 'line',
+                        smooth: true
+                    }
+                ]
+            };
+
+            $.ajax({
+                url: "/chart/bar",
+                type: "get",
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+
+                        option.xAxis.data = res.data.time_list;
+                        option.series = res.data.series_list;
+                        {#option.yAxis.data=res.data.ph_list;#}
+                        {#option.series.data=[1,5,1,7];#}
+
+                        option && myChart.setOption(option);
+                    }
+                }
+            })
+
+
+        }
+
+        function initPie() {
+            var chartDom = document.getElementById('m4');
+            var myChart = echarts.init(chartDom);
+            var option;
+
+            option = {
+                title: {text: "天气占比"},
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    top: '5%',
+                    left: 'center'
+                },
+                series: [
+                    {
+                        name: 'Access From',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: 40,
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            {value: 1048, name: 'Search Engine'},
+                            {value: 735, name: 'Direct'},
+                            {value: 580, name: 'Email'},
+                        ]
+                    }
+                ]
+            };
+            $.ajax({
+                url: "/chart/pie/",
+                type: "get",
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+
+                        option.series[0].data = res.data;
+
+                        option && myChart.setOption(option);
+                    }
+                }
+            })
+        }
+
+        function initPoint() {
+
+            var chartDom = document.getElementById('m3');
+            var myChart = echarts.init(chartDom);
+            var option;
+
+            option = {
+                title:{text:"ph值"},
+                xAxis: {type: 'category',data:[]},
+                yAxis: {},
+                series: [
+                    {
+                        symbolSize: 10,
+                        data: [
+                        ],
+                        type: 'scatter'
+                    }
+                ]
+            };
+            $.ajax({
+                url: "/chart/point/",
+                type: "get",
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+                        option.xAxis.data=res.xAxis;
+                        option.series[0].data=res.data
+                        option && myChart.setOption(option);
+                    }
+                }
+            })
+            option && myChart.setOption(option);
+        }
+
+    </script>
+{% endblock %}
