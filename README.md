@@ -11,7 +11,7 @@
 5.视图函数中实例化modelform后就可以进行数据的检验了
 6.最后返回可能被数据替换占位符后的html,用户浏览器再进行数据遍历渲染
 
-插件上:在utils中封装了BootStrap在ModelForm中使用的类,以及一个分页类,echarts以及jquery都存放在static中
+插件上:在utils中封装了BootStrap在ModelForm中使用的类,以及一个分页类,而echarts以及jquery都存放在static中
 模板可以通过继承layout基类来进行导入渲染
 
 echarts上:
